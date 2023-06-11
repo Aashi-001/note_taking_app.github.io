@@ -44,7 +44,7 @@
         padding: 15px 15px;
         display: block;
         border: 1px;
-        border-radius: 40px;
+        border-radius: 20px;
         background-color: rgb(245, 245, 220);
         box-shadow: 5px 10px;
       }
@@ -151,7 +151,7 @@
 </head>
 
 <body id="gradient">
-  <nav class="navbar navbar-expand-lg fixed-top shadow-5-strong"
+    <nav class="navbar navbar-expand-lg fixed-top shadow-5-strong"
     style="background-color: rgb(255,255,255,0.3);margin-left:15px;margin-right:15px;margin-top:15px;">
     <div class="container-fluid">
       <a class="navbar-brand" href="/" style="color: black">NoteBook</a>
@@ -217,112 +217,54 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
     crossorigin="anonymous"></script>
-  <script>
-    async function postData(url = "", data = {}) {
-      // Default options are marked with *
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      let rdata = await response.json();
-      return rdata;
-    }
-
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user && user.email) {
-      const notes = postData("/getnotes", { email: user.email });
-      notes.then((notes) => {
-        console.log("Notes", notes.notes);
-        notes.notes.forEach((element) => {
-          let note1 = `
-            <div class="card mx-2 my-2" id="reversegradient" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">${element.title}</h5>
-              <p class="card-text">${element.note}</p>
-              <a href="#" id="deletenote" class="deleteObject" data-objectid="${element._id}">Delete Note</a>
-              <a href="#" id="editnote" class="editObject" data-objectid="${element._id}">Edit Note</a>
-              <script src="./models/notes.js">
-                console.log("execute")
-              <\/script>
-            </div>
-          </div>
-          `;
-          let noteContainer = document.querySelector(".mynotes");
-          noteContainer.innerHTML += note1;
-
+    <script>
+      async function postData(url = "", data = {}) {
+        // Default options are marked with *
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         });
-        // document.addEventListener('click', function (event) {
-        //     if (event.target.classList.contains('editObject')) {
-        //       event.preventDefault();
-        //       const objectId = event.target.getAttribute('data-objectid');
-        //       console.log('Object ObjectId:', objectId);
-
-        //       // const noteInput = prompt('Enter the new note:');
-
-        //       // // Create an object with the updated note data
-        //       // const updatedNote = {
-        //       //   objectId: objectId,
-        //       //   note: noteInput
-        //       // };
-        //       fetch(`/getnote/${objectId}`)
-        //       .then(response => response.json())
-        //       .then(data => {
-        //         const existingNote = data.note;
-
-        //         const noteInput = prompt('Enter the new note:', existingNote);
-
-        //         // Create an object with the updated note data
-        //         const updatedNote = {
-        //           objectId: objectId,
-        //           note: noteInput
-        //       };
-
-        //       fetch('/editnote', {
-        //         method: 'POST',
-        //         headers: {
-        //           'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(updatedNote)
-        //       })
-        //         .then(response => response.json())
-        //         .then(data => {
-        //           console.log('Server response:', data);
-        //           // Perform further actions with the server response
-        //         })
-        //         .catch(error => {
-        //           console.error('Error:', error);
-        //         });
-        //     }
-        //   });
-        document.addEventListener('click', function (event) {
-          if (event.target.classList.contains('editObject')) {
-            event.preventDefault();
-            const objectId = event.target.getAttribute('data-objectid');
-            console.log('Object ObjectId:', objectId);
-
-            // Fetch the existing note from the server
-            fetch(`/getnote/${objectId}`)
-              .then(response => response.json())
-              .then(data => {
-                const existingNote = data.note;
-
-                const noteInput = prompt('Enter the new note:', existingNote);
-
-                // Create an object with the updated note data
-                const updatedNote = {
-                  objectId: objectId,
-                  note: noteInput
-                };
-
-                fetch('/editnote', {
+        let rdata = await response.json();
+        return rdata;
+      }
+  
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (user && user.email) {
+        const notes = postData("/getnotes", { email: user.email });
+        notes.then((notes) => {
+          console.log("Notes", notes.notes);
+          notes.notes.forEach((element) => {
+            let note1 = `
+              <div class="card mx-2 my-2" id="reversegradient" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">${element.title}</h5>
+                <p class="card-text">${element.note}</p>
+                <a href="#" id="deletenote" class="fetchObject" data-objectid="${element._id}">Delete Note</a>
+                <a href="#" id="editnote" class="editObject" data-objectid="${element._id}">Edit Note</a>
+                <script src="./models/notes.js">
+                  console.log("execute")
+                <\/script>
+              </div>
+            </div>
+            `;
+            let noteContainer = document.querySelector(".mynotes");
+            noteContainer.innerHTML += note1;
+            
+          });
+          document.addEventListener('click', function (event) {
+              if (event.target.classList.contains('fetchObject')) {
+                event.preventDefault();
+                const objectId = event.target.getAttribute('data-objectid');
+                console.log('Object ObjectId:', objectId);
+                fetch('/deletenote', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json'
                   },
-                  body: JSON.stringify(updatedNote)
+                  body: JSON.stringify({ objectId: objectId })
                 })
                   .then(response => response.json())
                   .then(data => {
@@ -332,70 +274,34 @@
                   .catch(error => {
                     console.error('Error:', error);
                   });
-              })
-              .catch(error => {
-                console.error('Error fetching note:', error);
-              });
-          }
+              }
+            });
         });
-
-        document.addEventListener('click', function (event) {
-          if (event.target.classList.contains('deleteObject')) {
-            event.preventDefault();
-            const objectId = event.target.getAttribute('data-objectid');
-            console.log('Object ObjectId:', objectId);
-            fetch('/deletenote', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ objectId: objectId })
-            })
-              .then(response => response.json())
-              .then(data => {
-                console.log('Server response:', data);
-                // Check the server response for success or failure
-                if (data.success) {
-                  // Redirect to the home page
-                  console.log(data)
-                  window.location.reload();
-                } else {
-                  // Handle deletion failure
-                  console.error('Deletion failed:', data.error);
-                  // Perform further error handling or display error messages
-                }
-              })
-              .catch(error => {
-                console.error('Error:', error);
-              });
-          }
-        });
-      });
-    } else {
-      window.location = '/'
-      if (confirm("Login?") == true) {
-        window.location = '/login'
       } else {
         window.location = '/home'
+        // if (confirm("Login?") == true) {
+        //   window.location = '/login'
+        // } else {
+        //   window.location = '/home'
+        // }
       }
-    }
-    function fetchObjectId() {
-      const YourModel = require('./models/notes.js');
-      YourModel.findOne({ title: '${element.title}' }, (err, doc) => {
-        if (err) {
-          console.error('Error fetching object:', err);
-        } else {
-          if (doc) {
-            const objectId = doc._id;
-            console.log('Object ObjectId:', objectId);
+      function fetchObjectId() {
+        const YourModel = require('./models/notes.js');
+        YourModel.findOne({ title: '${element.title}' }, (err, doc) => {
+          if (err) {
+            console.error('Error fetching object:', err);
           } else {
-            console.log('Object not found.');
+            if (doc) {
+              const objectId = doc._id;
+              console.log('Object ObjectId:', objectId);
+            } else {
+              console.log('Object not found.');
+            }
           }
-        }
-      });
-    }
-
-  </script>
+        });
+      }
+      
+    </script>
 </body>
 
 </html>

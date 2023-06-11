@@ -12,45 +12,51 @@
     />
   </head>
   <body style="height: 830px; background-color: #f1f1f1; background-image: linear-gradient(pink, blue);">
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-5-strong">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/" style="color: black">NoteBook</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item mx-2">
-              <a class="nav-link active" aria-current="page" href="/" style="color: black">Home</a>
-            </li>
-            <li class="nav-item mx-2">
-              <a class="nav-link" href="/newnote" style="color: black">Add new note</a>
-            </li>
-          </ul>
-          <div class="d-flex" role="search">
-            <a href="/login"><button class="btn btn-primary mx-2" type="submit" style="background-color: blue; border-radius: 10px;">
-                Login
-              </button></a>
-            <a href="/signup"><button class="btn btn-primary mx-2" type="submit" style="background-color: blue; border-radius: 10px;">
-                SignUp
-              </button></a>
-          </div>
+    <nav class="navbar navbar-expand-lg fixed-top shadow-5-strong" style="background-color: rgb(255,255,255,0.3);margin-left:15px;margin-right:15px;margin-top:15px;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/" style="color: black">NoteBook</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item mx-2">
+            <a class="nav-link active" aria-current="page" href="/home" style="color: black">Home</a>
+          </li>
+          <li class="nav-item mx-2">
+            <a class="nav-link" href="/newnote" style="color: black">Add new note</a>
+          </li>
+        </ul>
+        <div class="d-flex" role="search">
+          <a href="/login"><button class="btn btn-primary mx-2" type="submit"
+              style="background-color: blue; border-radius: 10px;">
+              Login
+            </button></a>
+          <a href="/logout"><button class="btn btn-primary mx-2" type="submit"
+              style="background-color: blue; border-radius: 10px;">
+              LogOut
+            </button></a>
+          <a href="/signup"><button class="btn btn-primary mx-2" type="submit"
+              style="background-color: blue; border-radius: 10px;">
+              SignUp
+            </button></a>
         </div>
       </div>
-    </nav>
+    </div>
+  </nav>
     <div class="container">
-      <h1>New Note</h1>
+      <h1 style="margin-top: 85px; margin-left: -50px;">New Note</h1>
       <div>
-        <div class="mb-3">
+        <div style=" margin-top:20px; margin-left: -50px;">
           <label for="title" class="form-label">Title</label>
           <input type="title" class="form-control" id="title">
         </div>
-        <div class="mb-3">
+        <div style="margin-left: -50px;">
           <label for="exampleFormControlTextarea1" class="form-label">Make Note</label>
           <textarea class="form-control" id="note" rows="3"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+        <button type="submit" class="btn btn-primary" id="submit" style="margin-top:20px;margin-left:-50px;">Submit</button>
        </div>
     </div>
     <script
@@ -72,9 +78,9 @@
         return rdata; 
       }
       const user = JSON.parse(localStorage.getItem('user'))
-    //   if(!user || !user.token){
-    //     window.location = '/login'
-    //   }
+      if(!user){
+        window.location = '/login'
+      }
       let submit = document.getElementById("submit")
       submit.addEventListener("click", async ()=>{
         let title = document.getElementById("title").value
@@ -86,6 +92,7 @@
           alert("note added")
           document.getElementById("title").value = ""
           document.getElementById("note").value = ""
+          window.location = '/'
         }
       })
     </script>

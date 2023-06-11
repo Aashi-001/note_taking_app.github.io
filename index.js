@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const Note = require('./models/notes')
 const User = require('./models/user')
+const CryptoJS = require('crypto-js');
 const app = express()
 app.use(express.json({extended: true}))
 // app.use(express.urlencoded())
@@ -29,20 +30,20 @@ var ObjectId = require('mongodb').ObjectId;
 app.get('/', (req, res) => {
   res.sendFile("pages/index.html", {root: __dirname})
 })
-
+app.get('/home', (req, res) => {
+  res.sendFile("pages/home.html", {root: __dirname})
+})
 app.get('/login', (req, res) => {
     res.sendFile("pages/login.html", {root: __dirname})
   })
-
+app.get('/logout', (req, res) => {
+    res.sendFile("pages/logout.html", {root: __dirname})
+  })
 app.get('/signup', (req, res) => {
     res.sendFile("pages/signup.html", {root: __dirname})
   })
-
 app.get('/newnote', (req, res) => {
     res.sendFile("pages/newnote.html", {root: __dirname})
-  })
-app.get('/deletenode', (req, res) => {
-    res.sendFile("pages/deletenode.html", {root: __dirname})
   })
 
 app.post('/getnotes', async (req, res) => {
@@ -81,22 +82,110 @@ app.post('/deletenote', async function(req, res){
     });
   })
 
+app.get('/getnote/:objectId', (req, res) => {
+    const { objectId } = req.params;
+  
+    // Check if the provided objectId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(objectId)) {
+      res.status(400).json({ error: 'Invalid objectId.' });
+      return;
+    }
+  
+    // Find the note by the provided objectId
+    Note.findById(objectId)
+      .then(foundNote => {
+        if (!foundNote) {
+          console.log('Note not found.');
+          res.status(404).json({ error: 'Note not found.' });
+          return;
+        }
+  
+        // Return the found note
+        res.status(200).json({ note: foundNote.note });
+      })
+      .catch(err => {
+        console.error('Error fetching note:', err);
+        res.status(500).json({ error: 'An error occurred while fetching the note.' });
+      });
+  });
+
+app.post('/editnote', (req, res) => {
+  const { objectId, note } = req.body;
+
+  // Check if the provided objectId is a valid ObjectId
+  if (!mongoose.Types.ObjectId.isValid(objectId)) {
+    res.status(400).json({ error: 'Invalid objectId.' });
+    return;
+  }
+
+  // Find the note by the provided objectId
+  Note.findById(objectId)
+    .then(foundNote => {
+      if (!foundNote) {
+        console.log('Note not found.');
+        res.status(404).json({ error: 'Note not found.' });
+        return Promise.reject(); // Reject the promise chain to skip to the catch block
+      }
+
+      // Append the new note to the existing note
+      foundNote.note = note;
+
+      // Save the updated note
+      return foundNote.save();
+    })
+    .then(updatedNote => {
+      console.log('Updated note:', updatedNote.note);
+      res.status(200).json({ message: 'Note updated successfully.', note: updatedNote });
+    })
+    .catch(err => {
+      console.error('Error updating note:', err);
+      res.status(500).json({ error: 'An error occurred while updating the note.' });
+    });
+});
+
+
+// ...
+
+  
+  
+
 app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  let user = await User.findOne({ email });
+  
+  if (!user) {
+    res.status(200).json({ success: false, message: "No user found" });
+  } else {
+    // Compare the hashed password with the provided password
+    const hashedPassword = CryptoJS.SHA256(password).toString();
+    
+    if (hashedPassword === user.password) {
+      res.status(200).json({ success: true, user: { email: user.email }, message: "User found" });
+    } else {
+      res.status(200).json({ success: false, message: "Invalid password" });
+    }
+  }
+});
+
+  app.post('/logout', async(req, res) => {
+    // Perform any necessary logout actions here
+    // This could include clearing the user token or any session-related data
     const {userToken} = req.body
     let user = await User.findOne(req.body)
-    if(!user){
-      res.status(200).json({success: false, message: "No user found"})
-    }
-    else{
-      res.status(200).json({success: true, user: {email: user.email}, message:"User found"})
-    }
-    // res.sendFile("pages/newnote.html", {root: __dirname})
-  })
+    // console.log(user)
+    
+    // console.log(user)
+    res.status(200).json({ success: true, message: 'Logged out successfully' });
+  });
+  
 
 app.post('/signup', async(req, res) => {
-    const {userToken} = req.body
+    const {email, password} = req.body
     console.log(req.body)
-    let user = await User.create(req.body)
+
+    const hashedPassword = CryptoJS.SHA256(password).toString();
+
+    let user = await User.create({ email, password: hashedPassword });
     res.status(200).json({success:true, user: user})
   })
 
